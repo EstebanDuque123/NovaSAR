@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Usuarios Registrados</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f1f3f6;
+            margin: 0;
+            padding: 2rem;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            max-width: 900px;
+            background-color: #fff;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.1);
+        }
+
+        h2 {
+            margin-bottom: 1rem;
+            color: #2c3e50;
+        }
+
+        .btn-volver {
+            display: inline-block;
+            margin-bottom: 1rem;
+            color: #1a73e8;
+            text-decoration: none;
+        }
+
+        .btn-volver:hover {
+            text-decoration: underline;
+        }
+
+        .btn-crear {
+            display: inline-block;
+            margin-bottom: 1rem;
+            background-color: #27ae60;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 0.95rem;
+        }
+
+        .btn-crear:hover {
+            background-color: #219150;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            text-align: left;
+            padding: 0.75rem;
+            border-bottom: 1px solid #ccc;
+        }
+
+        th {
+            background-color: #f5f5f5;
+        }
+
+        tr:hover {
+            background-color: #f9f9f9;
+        }
+
+        .acciones a {
+            margin-right: 0.5rem;
+            text-decoration: none;
+            padding: 0.4rem 0.8rem;
+            border-radius: 6px;
+            font-size: 0.9rem;
+        }
+
+        .acciones .editar {
+            background-color: #2980b9;
+            color: white;
+        }
+
+        .acciones .editar:hover {
+            background-color: #2471a3;
+        }
+
+        .acciones .eliminar {
+            background-color: #e74c3c;
+            color: white;
+        }
+
+        .acciones .eliminar:hover {
+            background-color: #c0392b;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Usuarios Registrados</h2>
+
+        <a href="{% url 'buscador' %}" class="btn-volver">← Volver al Buscador</a><br>
+
+        <a href="{% url 'crear_usuario' %}" class="btn-crear">+ Crear nuevo usuario</a>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Nombre de usuario</th>
+                    <th>Límite de búsquedas</th>
+                    <th>Límite de reportes</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for usuario in usuarios %}
+                <tr>
+                    <td>{{ usuario.username }}</td>
+                    <td>{{ usuario.perfilusuario.limite_busquedas }}</td>
+                    <td>{{ usuario.perfilusuario.limite_reportes }}</td>
+                    <td class="acciones">
+                        <a href="{% url 'editar_usuario' usuario.id %}" class="editar">Editar</a>
+                        <a href="{% url 'eliminar_usuario' usuario.id %}" class="eliminar">Eliminar</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>

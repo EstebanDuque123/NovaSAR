@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Cierre de sesión</title>
+</head>
+<body>
+    <h2>Has cerrado sesión correctamente</h2>
+    <form method="POST" action="{% url 'logout' %}">
+        {% csrf_token %}
+        <button type="submit">Cerrar sesión</button>
+    </form>
+    <a href="{% url 'login' %}">Volver a iniciar sesión</a>
+</body>
+</html>

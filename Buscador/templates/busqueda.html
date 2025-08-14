@@ -1,0 +1,206 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Buscador NovaSAR</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 40px auto;
+            max-width: 600px;
+            background-color: #f9f9f9;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+
+        img.banner {
+            width: 100%;
+            height: auto;
+            margin-bottom: 20px;
+            border-radius: 10px;
+        }
+
+        h2 {
+            color: #333;
+            text-align: center;
+        }
+
+        form {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            justify-content: center;
+        }
+
+        input[type="text"] {
+            flex: 1;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        button {
+            padding: 8px 16px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background-color: #fff;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 0 5px rgba(0,0,0,0.1);
+        }
+
+        th, td {
+            text-align: left;
+            padding: 12px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #007bff;
+            color: white;
+        }
+
+        tr:hover {
+            background-color: #f1f1f1;
+        }
+
+        .button-container {
+    text-align: center;
+    margin-top: 20px; /* Ajusta el espacio superior según necesites */
+}
+
+form .button-container {
+    width: 100%; /* Asegura que ocupe el ancho completo */
+    margin: 40px auto; /* Centra el botón debajo de todo */
+}
+
+.gestion-usuarios {
+    background-color: #fff;
+    padding: 1.5rem;
+    margin-top: 2rem;
+    border-radius: 10px;
+    box-shadow: 0 0 15px rgba(0,0,0,0.1);
+    max-width: 400px;
+    margin: 1rem auto;
+}
+
+.titulo-gestion {
+    color: #2c3e50;
+    margin-bottom: 1.2rem;
+    font-size: 1.5rem;
+}
+
+.lista-acciones {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+
+.lista-acciones li {
+    margin-bottom: 1rem;
+}
+
+.btn-accion {
+    display: block;
+    padding: 0.7rem;
+    text-align: center;
+    background-color: #27ae60;
+    color: white;
+    text-decoration: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: background-color 0.3s ease;
+}
+
+.btn-accion:hover {
+    background-color: #219150;
+}
+
+    </style>
+</head>
+<body>
+    <img src="{% static 'img/banner.png' %}" alt="Banner NovaSAR" class="banner">
+    <h2>Bienvenido, {{ user.username }}</h2>
+    {% if es_administrador %}
+    <div class="gestion-usuarios">
+        <h3 class="titulo-gestion">Gestión de Usuarios</h3>
+        <ul class="lista-acciones">
+            <li><a href="{% url 'crear_usuario' %}" class="btn-accion">Crear Usuario</a></li>
+            <li><a href="{% url 'lista_usuarios' %}" class="btn-accion">Listar Usuarios</a></li>
+        </ul>
+    </div>
+    {% endif %}
+    <p style="text-align: center;">
+        Búsquedas realizadas: {{ perfil.busquedas_realizadas }} / {{ perfil.limite_busquedas }}<br>
+        Reportes generados: {{ perfil.reportes_generados }} / {{ perfil.limite_reportes }}
+    </p>
+    
+    {% if error %}
+        <p style="color: red; text-align: center;">{{ error }}</p>
+    {% endif %}
+    <form action="{% url 'logout' %}" method="POST">
+        {% csrf_token %}
+        <button type="submit">Cerrar sesión</button>
+    </form>
+
+    <h2>Buscador NovaSAR</h2>
+    <form method="POST">
+        {% csrf_token %}
+        <input type="text" name="termino" placeholder="Buscar nombre" value="{{ termino }}">
+        <button type="submit">Buscar</button>
+    </form>
+
+    {% if resultados %}
+    <h3>Resultados:</h3>
+    <form method="POST" action="{% url 'generar_pdf' %}" target="_blank">
+        {% csrf_token %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Seleccionar</th>
+                    <th>Nombre</th>
+                    <th>Identificación</th>
+                    <th>Lista</th>
+                    <th>Tipo de Lista</th>
+                    <th>Fecha de Ingreso</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for persona in resultados %}
+                    <tr>
+                        <td><input type="checkbox" name="personas" value="{{ persona.id }}"></td>
+                        <td>{{ persona.nombre }}</td>
+                        <td>{{ persona.identificacion }}</td>
+                        <td>{{ persona.lista.nombre }}</td>
+                        <td>{{ persona.lista.tipo }}</td>
+                        <td>{{ persona.fecha_ingreso }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    
+        <!-- Contenedor del botón separado y al final -->
+        <div class="button-container">
+            <button type="submit">Generar PDF</button>
+        </div>
+    </form>
+    {% elif termino %}
+    <p>No se encontraron coincidencias para "{{ termino }}"</p>
+    {% endif %}   
+</body>
+</html>

@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Editar Usuario</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f6f8;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .form-container {
+            background-color: #fff;
+            padding: 2rem 2.5rem;
+            border-radius: 15px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.1);
+            width: 400px;
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 1.5rem;
+            color: #333;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.3rem;
+            font-weight: bold;
+            color: #444;
+        }
+
+        input {
+            width: 100%;
+            padding: 0.6rem;
+            margin-bottom: 1rem;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+        }
+
+        button {
+            width: 100%;
+            padding: 0.8rem;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #218838;
+        }
+
+        .btn-volver {
+            display: inline-block;
+            margin-bottom: 1rem;
+            color: #1a73e8;
+            text-decoration: none;
+            font-size: 0.95rem;
+        }
+
+        .btn-volver:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="form-container">
+        <h2>Editar Usuario: {{ usuario.username }}</h2>
+
+        <a href="{% url 'buscador' %}" class="btn-volver">← Volver al Buscador</a>
+
+        <form method="POST">
+            {% csrf_token %}
+            {{ form.as_p }}
+            {{ perfil_form.as_p }}
+            <button type="submit">Guardar cambios</button>
+        </form>
+    </div>
+</body>
+</html>
