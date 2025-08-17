@@ -4,7 +4,7 @@ from Buscador.models import Lista, PersonaLista
 from datetime import datetime
 
 class Command(BaseCommand):
-    help = 'Carga masiva de personas desde un archivo CSV'
+    help = 'Sincroniza las personas desde un archivo CSV (agrega, actualiza y elimina)'
 
     def add_arguments(self, parser):
         parser.add_argument('archivo_csv', type=str, help='Ruta al archivo CSV a cargar')
@@ -12,42 +12,54 @@ class Command(BaseCommand):
     def handle(self, *args, **kwargs):
         archivo_csv = kwargs['archivo_csv']
 
-        # Usa la codificación 'utf-8-sig' para eliminar el BOM
+        # Lee todo el CSV
         with open(archivo_csv, newline='', encoding='utf-8-sig') as csvfile:
-            reader = csv.DictReader(csvfile, delimiter=';')  # Usamos el delimitador de punto y coma
-            
-            # Imprime los nombres de las columnas (encabezados) para ver si son correctos
+            reader = csv.DictReader(csvfile, delimiter=';')
+
             print("Encabezados:", reader.fieldnames)
 
-            total = 0
+            # Guardamos todos los IDs únicos del CSV para comparar luego
+            personas_csv = []
+            listas_csv = []
+
             for row in reader:
-                # Imprime cada fila para depuración
-                print(row)
-                
                 try:
                     nombre_lista = row['lista']
                     tipo_lista = row['tipo_lista']
                     fuente = row['fuente']
+                    fecha_ingreso = datetime.strptime(row['fecha_ingreso'], '%d/%m/%Y').date()
+                    nombre = row['nombre']
+                    identificacion = row.get('identificacion', '')
                 except KeyError as e:
                     print(f"Error en la clave: {e}")
                     continue
 
-                lista_obj, _ = Lista.objects.get_or_create(
+                # --- Listas ---
+                lista_obj, _ = Lista.objects.update_or_create(
                     nombre=nombre_lista,
                     defaults={
                         'tipo': tipo_lista,
                         'fuente': fuente,
                     }
                 )
+                listas_csv.append(lista_obj.id)
 
-                fecha_ingreso = datetime.strptime(row['fecha_ingreso'], '%d/%m/%Y').date()
-
-                PersonaLista.objects.create(
-                    nombre=row['nombre'],
-                    identificacion=row.get('identificacion', ''),
+                # --- Personas ---
+                persona, _ = PersonaLista.objects.update_or_create(
+                    identificacion=identificacion,
                     lista=lista_obj,
-                    fecha_ingreso=fecha_ingreso
+                    defaults={
+                        'nombre': nombre,
+                        'fecha_ingreso': fecha_ingreso
+                    }
                 )
-                total += 1
+                personas_csv.append(persona.id)
 
-        self.stdout.write(self.style.SUCCESS(f'Se cargaron {total} registros desde {archivo_csv}'))
+            # --- Eliminar registros que ya no están en el CSV ---
+            eliminadas_listas = Lista.objects.exclude(id__in=listas_csv).delete()
+            eliminadas_personas = PersonaLista.objects.exclude(id__in=personas_csv).delete()
+
+        self.stdout.write(self.style.SUCCESS(
+            f"✅ Sincronización completada.\n"
+            f"Listas eliminadas: {eliminadas_listas[0]} | Personas eliminadas: {eliminadas_personas[0]}"
+        ))
