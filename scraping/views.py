@@ -35,7 +35,7 @@ def cargar_listas(request):
         except Exception as e:
             messages.error(request, f"❌ Error al cargar las listas: {e}")
 
-        return redirect("cargar_listas")
+        return redirect("scraping:cargar_listas")
 
     return render(request, "scraping/cargar_listas.html")
 
