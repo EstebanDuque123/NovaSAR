@@ -1,0 +1,61 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Django stuff:
+*.log
+*.pot
+*.pyc
+*.pyo
+*.mo
+*.db
+*.sqlite3
+*.sqlite3-journal
+
+# Django migrations (opcional: si quieres ignorar las locales)
+# Quita esta línea si quieres versionarlas
+*/migrations/*.py
+!*/migrations/__init__.py
+
+# Media and static (generados en runtime)
+media/
+staticfiles/
+static/
+
+# Environment
+.env
+.venv
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# IDEs
+.vscode/
+*.code-workspace
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Coverage / Testing
+.coverage
+*.cover
+htmlcov/
+.pytest_cache/
+
+# MyPy / Pyre / Pytype
+.mypy_cache/
+.dmypy.json
+dmypy.json
+.pyre/
+.pytype/
+
+# Logs
+*.log
+
+# Local configs / secrets
+local_settings.py
+settings_local.py
