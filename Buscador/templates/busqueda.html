@@ -166,42 +166,44 @@ form .button-container {
         <button type="submit">Buscar</button>
     </form>
 
-    {% if resultados %}
-    <h3>Resultados:</h3>
-    <form method="POST" action="{% url 'generar_pdf' %}" target="_blank">
-        {% csrf_token %}
-        <table>
-            <thead>
+{% if resultados %}
+<h3>Resultados:</h3>
+<form method="POST" target="_blank">
+    {% csrf_token %}
+    <table>
+        <thead>
+            <tr>
+                <th>Seleccionar</th>
+                <th>Nombre</th>
+                <th>Identificación</th>
+                <th>Lista</th>
+                <th>Tipo de Lista</th>
+                <th>Fecha de Ingreso</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for persona in resultados %}
                 <tr>
-                    <th>Seleccionar</th>
-                    <th>Nombre</th>
-                    <th>Identificación</th>
-                    <th>Lista</th>
-                    <th>Tipo de Lista</th>
-                    <th>Fecha de Ingreso</th>
+                    <td><input type="checkbox" name="personas" value="{{ persona.id }}"></td>
+                    <td>{{ persona.nombre }}</td>
+                    <td>{{ persona.identificacion }}</td>
+                    <td>{{ persona.lista.nombre }}</td>
+                    <td>{{ persona.lista.tipo }}</td>
+                    <td>{{ persona.fecha_ingreso }}</td>
                 </tr>
-            </thead>
-            <tbody>
-                {% for persona in resultados %}
-                    <tr>
-                        <td><input type="checkbox" name="personas" value="{{ persona.id }}"></td>
-                        <td>{{ persona.nombre }}</td>
-                        <td>{{ persona.identificacion }}</td>
-                        <td>{{ persona.lista.nombre }}</td>
-                        <td>{{ persona.lista.tipo }}</td>
-                        <td>{{ persona.fecha_ingreso }}</td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    
-        <!-- Contenedor del botón separado y al final -->
-        <div class="button-container">
-            <button type="submit">Generar PDF</button>
-        </div>
-    </form>
-    {% elif termino %}
-    <p>No se encontraron coincidencias para "{{ termino }}"</p>
-    {% endif %}   
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="button-container">
+        <!-- Botón PDF normal -->
+        <button type="submit" formaction="{% url 'generar_pdf' %}">Generar PDF</button>
+        <!-- Botón PDF con IA -->
+        <button type="submit" formaction="{% url 'generar_pdf_ia' %}">Generar PDF con IA</button>
+    </div>
+</form>
+{% elif termino %}
+<p>No se encontraron coincidencias para "{{ termino }}"</p>
+{% endif %}
 </body>
 </html>

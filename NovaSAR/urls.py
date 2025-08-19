@@ -26,4 +26,5 @@ urlpatterns = [
     path('', views.buscador, name='buscador'),
     path('generar-pdf/', views.generar_pdf, name='generar_pdf'),
     path("scraping/", include("scraping.urls")),
+    path("generar-pdf-ia/", views.generar_pdf_ia, name="generar_pdf_ia"),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
