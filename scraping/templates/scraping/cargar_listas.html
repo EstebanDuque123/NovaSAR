@@ -151,6 +151,14 @@
         {% endif %}
     </div>
 
+    <!-- Reporte PDF -->
+    <div class="card">
+        <h2>📑 Reporte Listas</h2>
+        <form method="get" action="{% url 'scraping:exportar_pdf' %}">
+            <button type="submit" class="btn-alt">Generar PDF</button>
+        </form>
+    </div>
+
     <!-- Scraping + Actualizar -->
     <div class="card">
         <h2>🔎 Argentina Profugos Scraping y Actualización</h2>

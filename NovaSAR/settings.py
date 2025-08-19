@@ -40,7 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'Buscador',
     'usuarios',
-    'scraping'
+    'scraping',
 ]
 
 MIDDLEWARE = [

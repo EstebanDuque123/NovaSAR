@@ -8,6 +8,11 @@ import pandas as pd
 from django.http import HttpResponse
 from Buscador.models import Lista, PersonaLista
 from datetime import datetime
+from django.contrib.auth.models import Group
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph
+from reportlab.lib.pagesizes import A4
+from reportlab.lib import colors
+from reportlab.lib.styles import getSampleStyleSheet
 
 def cargar_listas(request):
     if request.method == "POST" and request.FILES.get("archivo"):
@@ -139,3 +144,61 @@ def actualizar_lista(request):
         f"✅ Lista sincronizada. Se agregaron {total_agregados} nuevos registros y se eliminaron {total_eliminados} que ya no estaban en el scraping."
     )
     return redirect("scraping:cargar_listas")
+
+
+# Obtener todas las listas
+listas = Lista.objects.all()
+
+# Filtrar por fuente
+dian = Lista.objects.filter(fuente="DIAN")
+
+# Exportar a PDF (ejemplo rápido)
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle
+from reportlab.lib import colors
+from io import BytesIO
+
+
+
+def exportar_pdf(request):
+    data = [["ID", "Nombre", "Fuente", "Tipo", "Fecha Actualización"]]
+    
+    # Estilos para que el texto se ajuste
+    styles = getSampleStyleSheet()
+    style_normal = styles["Normal"]
+
+    for lista in Lista.objects.all():
+        # Cada valor se convierte en Paragraph para que haga wrap si es largo
+        data.append([
+            Paragraph(str(lista.id), style_normal),
+            Paragraph(lista.nombre, style_normal),
+            Paragraph(lista.fuente, style_normal),
+            Paragraph(lista.tipo, style_normal),
+            Paragraph(str(lista.fecha_actualizacion), style_normal),
+        ])
+
+    pdf_path = "listas.pdf"
+    pdf = SimpleDocTemplate(pdf_path, pagesize=A4, leftMargin=30, rightMargin=30)
+    
+    # Ajustar ancho de columnas proporcional
+    num_columnas = len(data[0])
+    ancho_total = A4[0] - pdf.leftMargin - pdf.rightMargin
+    ancho_columnas = [ancho_total / num_columnas] * num_columnas
+    
+    table = Table(data, colWidths=ancho_columnas)
+    table.setStyle(TableStyle([
+        ("BACKGROUND", (0,0), (-1,0), colors.grey),
+        ("TEXTCOLOR", (0,0), (-1,0), colors.whitesmoke),
+        ("ALIGN", (0,0), (-1,0), "CENTER"),
+        ("ALIGN", (0,1), (-1,-1), "LEFT"),  # contenido alineado a la izquierda
+        ("GRID", (0,0), (-1,-1), 1, colors.black),
+        ("VALIGN", (0,0), (-1,-1), "TOP"),  # evita que el texto se superponga verticalmente
+        ("FONTSIZE", (0,0), (-1,-1), 9),    # reduce tamaño de texto
+    ]))
+
+    pdf.build([table])
+    
+    # Retornar PDF como descarga
+    with open(pdf_path, "rb") as f:
+        response = HttpResponse(f.read(), content_type='application/pdf')
+        response['Content-Disposition'] = f'attachment; filename="listas.pdf"'
+        return response
